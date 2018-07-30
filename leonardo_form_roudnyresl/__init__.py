@@ -16,14 +16,32 @@ class Default(object):
     widgets = [
         'leonardo_form_roudnyresl.widget.roudnyreslform.models.RoudnyreslFormWidget'
     ]
+    
     config = {
         'ORDER_DEFAULT_TO_EMAIL':
         ('to@email.com', u"E-mail, na který se budou odesílat objednávky."),
-        'CHOICES_TYPE_PRODUCT': ('', 'JSON hodnoty'),
+        'CHOICES_TYPE_PRODUCT': ('', 'Tuple choices'),
+        'CHOICES_TLOUSTKY_PODSTAVY': ('', 'Tuple choices'),
+        'CHOICES_VYSKA_RELIEFU': ('', 'Tuple choices'),
+        'CHOICES_DOPRAVA': ('', 'Tuple choices'),
+        'CHOICES_PLATBA': ('', 'Tuple choices'),
+        'INFO_PRODUCT_ORDER': ('', 'Info text'),
     }
 
+    @property
+    def plugins(self):
+        return [
+            ('leonardo_form_roudnyresl.apps.roudnyresl', 'Roudnyresl form'),
+    ]
+
     js_files = [
-        'formset/jquery.formset.js'
+        'formset/jquery.formset.js',
+        'js/bootstrap-select.min.js',
+    ]
+    
+    css_files = [
+        'css/bootstrap-select.min.css',
+        'css/component.css',
     ]
 
     public = True

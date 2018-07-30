@@ -1,12 +1,158 @@
-{% extends "leonardo/common/modal.html" %}
-{% load i18n staticfiles %}
+{% extends widget.get_base_template %}
+{% load i18n staticfiles crispy_forms_tags leonardo_tags leonardo_page_tags %}
 
-{% block title %}{% trans "Order" %}{% endblock %}
+{% block content %}
+<style type="text/css">
+#roudnyreslform .form-group {
+    width: 50%;
+    float: left;
+    padding: 0px 15px;
+}
+#roudnyreslform > .form-group:last-of-type {
+    width: 100%;
+}
+#roudnyreslform textarea {
+  resize: none;
+}
+#roudnyreslform .has-error .help-block, .dynamic-error {
+    padding: 10px;
+    position: absolute;
+    margin-left: 33%;
+    margin-top: -71px;
+}
+.bootstrap-select.btn-group .dropdown-menu .dropdown-header span {
+    color: #404040;
+    font-weight: bold;
+    font-size: 13px;
+}
+.bootstrap-select.btn-group .dropdown-menu li.disabled .text {
+    color: #949494;
+}
+.dynamic-form-add a {
+    width: 12%;
+    float: left;
+    display: inline-block;
+}
+.dynamic-form-add .order-info-text {
+    width: 80%;
+    float: left;
+    display: inline-block;
+}
+form .help-icon {
+    margin-left: 8px;
+}
+.alert-order {
+    background-color: #b05d80;
+    border-color: #b05d80;
+    color: #ffffff;
+    text-align: center;
+}
+.remove-btn-formset {
+    color: #c30000;
+}
+input[type="file"] {
+    display: none;
+}
+.inputfile-1 + label {
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #b05d80;
+    width: 120px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-top: 6px;
+}
+</style>
+<div class="col-md-12">
+    <div class="alert alert-order fade in">
+        <strong>Jste nový zákazník?</strong> Před první objednávkou nás raději telefonicky kontaktujte. (telefon v patičce stránky)
+    </div>
+    <form id="roudnyreslform" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+        {{ form|crispy }}
 
-{% block page_header %}
-{% include "horizon/common/_page_header.html" with title=_("Order") %}
-{% endblock %}
+        <table class="table formset-table">
+            {{ orderproducts.management_form }}
 
-{% block body_main %}
-{% include "leonardo_form_roudnyresl/_roudnyreslorders_form.html" %}
+            {% for form in orderproducts.forms %}
+                {% if forloop.first %}
+                    <thead>
+                    <tr>
+                        {% for field in form.visible_fields %}
+                            <th>{{ field.label|capfirst }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                {% endif %}
+                <tr class="{% cycle row1,row2 %} formset_row">
+                    {% for field in form.visible_fields %}
+                        <td>
+                            {# Include the hidden fields in the form #}
+                            {% if forloop.first %}
+                                {% for hidden in form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+                            {% endif %}
+                            {{ field.errors.as_ul }}
+                            {{ field }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <input class="btn btn-order btn-block" type="submit" value="Objednat"/>
+    </form>
+</div>
+<script src="{% static 'formset/jquery.formset.js' %}"></script>
+<script type="text/javascript">
+$(function(){
+  $(".formset-table").insertAfter($("#id_dic").parent().parent());
+  $("#roudnyreslform input[type=file]").map(function(){
+      $(this).addClass("inputfile inputfile-1");
+      $(this).after("<label for='" + $(this).attr("id") + "'><span>Nahrát</span></label>");
+  });
+  $("option[value=neni-v-nabidce]").attr("disabled", "true")
+  $('.formset_row').formset({
+      addText: "<span class='btn btn-order'>Přidat produkt</span>",
+      deleteText: "<i class='fa fa-times-circle remove-btn-formset' aria-hidden='true'></i>",
+      prefix: "orderproduct_set"
+  });
+  function FileInputInit() {
+    setTimeout(function(){
+      $( '.inputfile' ).each( function(){
+        var $input   = $( this ),
+          $label   = $input.next( 'label' ),
+          labelVal = $label.html();
+
+        $input.on( 'change', function( e )
+        {
+          var fileName = '';
+
+          if( this.files && this.files.length > 1 )
+            fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+          else if( e.target.value )
+            fileName = e.target.value.split( '\\' ).pop();
+
+          if( fileName )
+            $label.find( 'span' ).html( fileName );
+          else
+            $label.html( labelVal );
+        });
+
+        // Firefox bug fix
+        $input
+        .on( 'focus', function(){ $input.addClass( 'has-focus' ); })
+        .on( 'blur', function(){ $input.removeClass( 'has-focus' ); });
+      });
+    }, 200);
+  }
+  $("select").selectpicker();
+  FileInputInit();
+  $(".add-row").click(function(){
+      $("select").selectpicker();
+      FileInputInit();
+  });
+  $(".dynamic-form-add td").append("<p class='order-info-text'>{{ request.LEONARDO_CONFIG.INFO_PRODUCT_ORDER|escapejs|safe }}</p>");
+});
+</script>
 {% endblock %}

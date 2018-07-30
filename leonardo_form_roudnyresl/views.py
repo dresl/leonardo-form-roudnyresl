@@ -11,66 +11,47 @@ from django.shortcuts import render
 from leonardo.decorators import require_auth
 from django.db import transaction
 from leonardo import forms, messages
+from django.forms import widgets
 from django.core.urlresolvers import reverse_lazy
 from django.forms import inlineformset_factory
-from .models import RoudnyreslOrders, RoudnyreslProducts
+from .models import RoudnyreslOrders, RoudnyreslProduct
 from .forms import RoudnyreslOrderFormSet
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 from leonardo.utils.emails import send_templated_email as send_mail
+from .form_choices import *
 
 
-class RoudnyreslOrderCreate(forms.ModalFormView, forms.views.CreateView):
+class RoudnyreslOrderCreate(CreateView):
     model = RoudnyreslOrders
-    template_name = "leonardo_form_roudnyresl/roudnyreslorders_form.html"
-    submit_label = "Objednat"
+    fields = ['jmeno', 'prijmeni', 'email',
+            'telefon', 'dorucovaci_adresa', 'firma',
+            'ico', 'dic', 'doprava', 'platba', 'zprava']
+
+    success_url = "/"
+
+    def get_form(self, form_class):
+        form = super(RoudnyreslOrderCreate, self).get_form(form_class)
+        form.fields['doprava'].widget = widgets.Select(choices=CHOICES_DOPRAVA)
+        form.fields['platba'].widget = widgets.Select(choices=CHOICES_PLATBA)
+        form.fields['zprava'].widget = widgets.Textarea(attrs={'rows':5})
+        return form
 
     def get_context_data(self, **kwargs):
-        ret = super(RoudnyreslOrderCreate, self).get_context_data(**kwargs)
-        if self.request.method == 'POST':
-            ret['orderproducts'] = RoudnyreslOrderFormSet(self.request.POST,self.request.FILES)
+        data = super(RoudnyreslOrderCreate, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['orderproducts'] = RoudnyreslOrderFormSet(self.request.POST, self.request.FILES)
         else:
-            ret['orderproducts'] = RoudnyreslOrderFormSet()
-
-        ret.update({
-            "view_name": "Objednávací formulář",
-            "modal_size": 'lg fullscreen',
-            "modal_header": 'Objednávací formulář',
-            })
-        return ret
-
+            data['orderproducts'] = RoudnyreslOrderFormSet()
+        return data
 
     def form_valid(self, form):
         context = self.get_context_data()
         orderproducts = context['orderproducts']
         with transaction.atomic():
             self.object = form.save()
+
             if orderproducts.is_valid():
                 orderproducts.instance = self.object
                 orderproducts.save()
-                prijmeni_text = orderproducts.data['prijmeni']
-                current_order = RoudnyreslOrders.objects.get(id=orderproducts.instance.id,)
-                subject_order = u"Objednávka - " + prijmeni_text
-                send_mail(
-                    subject_order,
-                    'leonardo_form_roudnyresl/roudnyresl_email.html', {
-                        'order_title': u"Objednávka",
-                        'order': current_order,
-                        'domain': Site.objects.get(request.site.name)
-                    },
-                    [email.strip() for email in settings.ORDER_DEFAULT_TO_EMAIL.split(',')],
-                    fail_silently=False,
-                )
-                subject_confirmation = u"Potvrzení o objednávce - " + request.site.name
-                send_mail(
-                    subject_confirmation,
-                    'leonardo_form_roudnyresl/roudnyresl_email.html', {
-                        'order_title': u"Potvrzení o objednávce",
-                        'order': current_order,
-                        'domain': Site.objects.get(name=request.site.name)
-                    },
-                    current_order.email,
-                    fail_silently=False,
-                )
-
         return super(RoudnyreslOrderCreate, self).form_valid(form)
 

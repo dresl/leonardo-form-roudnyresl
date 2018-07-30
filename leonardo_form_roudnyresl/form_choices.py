@@ -1,0 +1,8 @@
+# encoding: utf-8
+from django.conf import settings
+
+CHOICES_TYPE_PRODUCT = eval(settings.CHOICES_TYPE_PRODUCT)
+CHOICES_TLOUSTKY_PODSTAVY = eval(settings.CHOICES_TLOUSTKY_PODSTAVY)
+CHOICES_VYSKA_RELIEFU = eval(settings.CHOICES_VYSKA_RELIEFU)
+CHOICES_DOPRAVA = eval(settings.CHOICES_DOPRAVA)
+CHOICES_PLATBA = eval(settings.CHOICES_PLATBA)
