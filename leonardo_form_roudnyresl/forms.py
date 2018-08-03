@@ -46,7 +46,7 @@ DjangoField.default_error_messages = {
 
 class RoudnyreslOrderForm(django_forms.ModelForm):
     class Meta:
-        model = RoudnyreslOrders
+        model = RoudnyreslProduct
         exclude = ()
 
 RoudnyreslOrderFormSet = inlineformset_factory(RoudnyreslOrders, RoudnyreslProduct,
@@ -54,7 +54,15 @@ RoudnyreslOrderFormSet = inlineformset_factory(RoudnyreslOrders, RoudnyreslProdu
                                                 'produkt': widgets.Select(choices=CHOICES_TYPE_PRODUCT),
                                                 'tloustka': widgets.Select(choices=CHOICES_TLOUSTKY_PODSTAVY),
                                                 'vyska': widgets.Select(choices=CHOICES_VYSKA_RELIEFU),
-                                                'rozmer_motivu': widgets.TextInput(attrs={"class": "form-control"}),
+                                                'rozmer_motivu': widgets.TextInput(attrs={
+                                                    "class": "form-control",
+                                                    "required": "true",
+                                                    }),
+                                                'soubor': widgets.FileInput(attrs={
+                                                    "required": "true",
+                                                    }),
                                             },
-                                            form=RoudnyreslOrderForm, extra=1, formset=BaseInlineRoudnyreslFormSet)
+                                            form=RoudnyreslOrderForm, extra=1,
+                                            formset=BaseInlineRoudnyreslFormSet)
 
+# placeholder to rozmer_motivu ?

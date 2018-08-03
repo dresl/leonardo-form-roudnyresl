@@ -11,16 +11,11 @@ class RoudnyreslProductsInline(admin.TabularInline):
 
 class RoudnyreslOrdersAdmin(admin.ModelAdmin):
     model = RoudnyreslOrders
-    def get_readonly_fields(self, request, obj=None):
-        if obj is None:
-            return ['pub_date']
-        else:
-            return ['pub_date']
-        return []
     inlines = [RoudnyreslProductsInline]
     list_display = ('prijmeni', 'pub_date')
     list_filter = ['pub_date','prijmeni']
     search_fields = ['prijmeni']
+    readonly_fields = ['pub_date']
 
 
 admin.site.register(RoudnyreslOrders, RoudnyreslOrdersAdmin)

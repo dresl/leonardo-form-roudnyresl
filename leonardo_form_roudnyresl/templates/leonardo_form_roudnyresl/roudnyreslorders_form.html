@@ -44,8 +44,10 @@ form .help-icon {
 .remove-btn-formset {
     color: #c30000;
 }
-input[type="file"] {
-    display: none;
+#roudnyreslform input[type=file] {
+    opacity: 0;
+    height: 1px;
+    width: 5px;
 }
 .inputfile-1 + label {
     color: #ffffff;
@@ -62,7 +64,7 @@ input[type="file"] {
 #roudnyreslform .has-error .help-block, .dynamic-error {
     padding: 10px;
     position: absolute;
-    margin-left: 33%;
+    margin-left: 27%;
     margin-top: -71px;
 }
 td ul.errorlist {
@@ -78,7 +80,8 @@ td ul.errorlist li {
     <div class="alert alert-order fade in">
         <strong>Jste nový zákazník?</strong> Před první objednávkou nás raději telefonicky kontaktujte. (telefon v patičce stránky)
     </div>
-    <form id="roudnyreslform" action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+    <form id="roudnyreslform" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
         {{ form|crispy }}
 
         <table class="table formset-table">
@@ -118,15 +121,45 @@ td ul.errorlist li {
 $(function(){
   $(".formset-table").insertAfter($("#id_dic").parent().parent());
   $("#roudnyreslform input[type=file]").map(function(){
-      $(this).addClass("inputfile inputfile-1");
-      $(this).after("<label for='" + $(this).attr("id") + "'><span>Nahrát</span></label>");
+        $(this).addClass("inputfile inputfile-1");
+        $(this).after("<label for='" + $(this).attr("id") + "'><span>Nahrát</span></label>");
   });
   $("option[value=neni-v-nabidce]").attr("disabled", "true")
   $('.formset_row').formset({
-      addText: "<span class='btn btn-order'>Přidat produkt</span>",
-      deleteText: "<i class='fa fa-times-circle remove-btn-formset' aria-hidden='true'></i>",
-      prefix: "orderproduct_set"
+    addText: "<span class='btn btn-order'>Přidat produkt</span>",
+    deleteText: "<i class='fa fa-times-circle remove-btn-formset' aria-hidden='true'></i>",
+    prefix: "orderproduct_set"
   });
+  // fixes functions
+  function fixDeleteRequired() {
+    setTimeout(function(){
+      $(".delete-row").click(function(){
+          $(this).parent().parent().find("input").attr("required", false);
+          fixDeleteRowBtn();
+      });
+    }, 250);
+  }
+  function fixDeleteRowBtn() {
+    setTimeout(function(){
+      if ($(".formset_row:not([style*='display: none'])").length == 1) {
+        $(".delete-row").hide();
+      }
+    }, 10);
+  }
+  
+  // call fixes 
+  fixDeleteRequired();
+  fixDeleteRowBtn();
+  $(".add-row").click(function(){
+    fixDeleteRequired();
+    fixDeleteRowBtn();
+  });
+  $(".delete-row").click(function(){
+    fixDeleteRequired();
+    fixDeleteRowBtn();
+  });
+
+  // init file input
   function FileInputInit() {
     setTimeout(function(){
       $( '.inputfile' ).each( function(){

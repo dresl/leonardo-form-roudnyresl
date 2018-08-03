@@ -1,51 +1,55 @@
-<h2>{{ order_title }} - {{ order.get_full_name }} - {% now "d.m. Y H:i" %}</h2>
+{% extends widget.get_base_template %}
+{% load i18n staticfiles crispy_forms_tags leonardo_tags leonardo_page_tags %}
 
-<h3>Objednavatel: {{ order.get_full_name }}</h3>
-<table style="border: 1px solid #ccc;padding: 8px;width: 100%;">
+{% block content %}
+<h2>{{ order_title }} - {{ object.get_full_name }} - {% now "d.m. Y H:i" %}</h2>
+
+<h3>Objednavatel: {{ object.get_full_name }}</h3>
+<table style="border: none;padding: 8px;width: 100%;">
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">E-mail:</th>
-      <td>{{ order.email }}</td>
+      <td>{{ object.email }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Telefon:</th>
-      <td>{{ order.telefon }}</td>
+      <td>{{ object.telefon }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Firma:</th>
-      <td>{{ order.firma }}</td>
+      <td>{{ object.firma }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Doručovací adresa:</th>
-      <td>{{ order.dorucovaci_adresa }}</td>
+      <td>{{ object.dorucovaci_adresa }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">IČO:</th>
-      <td>{{ order.ico }}</td>
+      <td>{{ object.ico }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">DIČ:</th>
-      <td>{% firstof order.dic "-- nevyplněno --" %}</td>
+      <td>{% firstof object.dic "-- nevyplněno --" %}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Doprava:</th>
-      <td>{{ order.doprava }}</td>
+      <td>{{ object.doprava }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Platba:</th>
-      <td>{{ order.platba }}</td>
+      <td>{{ object.platba }}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Zpráva:</th>
-      <td>{% firstof order.zprava "-- nevyplněno --" %}</td>
+      <td>{% firstof object.zprava "-- nevyplněno --" %}</td>
     </tr>
     <tr>
       <th style="text-align: left;padding: 6px;width: 150px;">Vytvořeno:</th>
-      <td>{{ order.pub_date|date:"d.m. Y H:i" }}</td>
+      <td>{{ object.pub_date|date:"d.m. Y H:i" }}</td>
     </tr>
 </table>
 <h3>Razící štočky:</h3>
 <hr>
-{% if order.orderproduct_set.count == 0 %}
+{% if object.orderproduct_set.count == 0 %}
 <b>Objednavatel nezadal žádné produkty.</b>
 {% else %}
 <table style="border: 1px solid #e8e8e8;padding: 6px;width: 100%;border-collapse: collapse;">
@@ -56,14 +60,24 @@
         <th style="text-align: left;padding: 8px;border-bottom: 1px solid #ececec;">Rozměr motivu</th>
         <th style="text-align: left;padding: 8px;border-bottom: 1px solid #ececec;">Soubor</th>
     </tr>
-{% for product in order.orderproduct_set.all %}
+{% for product in object.orderproduct_set.all %}
     <tr style="background-color: {% cycle '#ffffff' '#f9f9f9' %}">
       <td style="text-align: left;padding: 8px">{{ product.produkt }}</td>
       <td style="text-align: left;padding: 8px">{{ product.tloustka }}</td>
       <td style="text-align: left;padding: 8px">{{ product.vyska }}</td>
       <td style="text-align: left;padding: 8px">{{ product.rozmer_motivu}}</td> 
-      <td style="text-align: left;padding: 8px"><a href="http://{{ site.domain }}/media/{{ product.soubor }}">/media/{{ product.soubor }}</a></td>
+      <td style="text-align: left;padding: 8px"><a href="/media/{{ product.soubor }}">/media/{{ product.soubor }}</a></td>
     </tr>
 {% endfor %}
 </table>
 {% endif %}
+<br>
+<div class="alert alert-info" role="alert">
+  Na zadaný e-mail ({{ object.email }}) jsme Vám zaslali objednávku s fakturou.
+</div>
+<style type="text/css">
+.gdpr {
+  display: none
+}
+</style>
+{% endblock %}

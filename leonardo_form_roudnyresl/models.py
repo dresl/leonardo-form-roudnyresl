@@ -34,8 +34,21 @@ class RoudnyreslOrders(models.Model):
         verbose_name=u"Poznámka", default='', blank=True)
     pub_date = models.DateTimeField(u'Datum objednávky', auto_now_add=True)
 
+    def get_full_name(self):
+        return str(self.jmeno.encode("utf-8") + " " + self.prijmeni.encode("utf-8"))
+
+    @property
+    def get_absolute_url(self):
+        from leonardo.module.web.widget.application.reverse import app_reverse
+        return app_reverse(
+            'created_order',
+            'leonardo_form_roudnyresl.apps.roudnyresl',
+            kwargs={
+                'pk': self.id,
+            })
+
     def __unicode__(self):
-        return self.jmeno
+        return self.jmeno.encode("utf-8")
 
     class Meta:
         ordering = ['jmeno', ]
