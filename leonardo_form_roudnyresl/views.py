@@ -75,6 +75,7 @@ class RoudnyreslOrderCreate(CreateView):
                     'leonardo_form_roudnyresl/roudnyresl_email.html', {
                         'order_title': "Potvrzení o objednávce",
                         'order': current_order,
+                        'site': self.request.site,
                     },
                     current_order.email,
                     fail_silently=False,
@@ -90,5 +91,4 @@ class CreatedOrderInfo(DetailView):
     def get_context_data(self, **kwargs):
         data = super(CreatedOrderInfo, self).get_context_data(**kwargs)
         data["order_title"] = "Shrnutí objednávky"
-        data["site"] = self.request.site
         return data
