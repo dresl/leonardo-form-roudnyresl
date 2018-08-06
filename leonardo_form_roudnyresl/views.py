@@ -27,6 +27,9 @@ class RoudnyreslOrderCreate(CreateView):
             'telefon', 'dorucovaci_adresa', 'firma',
             'ico', 'dic', 'doprava', 'platba', 'zprava']
 
+    def get_success_url(self):
+        return "/"
+
     def get_form(self, form_class):
         form = super(RoudnyreslOrderCreate, self).get_form(form_class)
         for field in form.fields:
