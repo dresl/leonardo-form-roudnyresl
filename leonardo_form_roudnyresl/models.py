@@ -63,9 +63,9 @@ class RoudnyreslProduct(models.Model):
     produkt = models.CharField(
         verbose_name=u"Vyberte produkt", max_length=255)
     tloustka = models.CharField(
-        verbose_name=u"Tloušťka podstavy", max_length=255)
+        verbose_name=u"Výška podstavy", max_length=255)
     vyska = models.CharField(
-        verbose_name=u"Šířka podstavy", max_length=255)
+        verbose_name=u"Výška reliéfu", max_length=255)
     rozmer_motivu = models.CharField(
         verbose_name=u"Rozměr raženého motivu", max_length=255)
     soubor = models.FileField(

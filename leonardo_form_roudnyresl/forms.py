@@ -64,5 +64,3 @@ RoudnyreslOrderFormSet = inlineformset_factory(RoudnyreslOrders, RoudnyreslProdu
                                             },
                                             form=RoudnyreslOrderForm, extra=1,
                                             formset=BaseInlineRoudnyreslFormSet)
-
-# placeholder to rozmer_motivu ?
