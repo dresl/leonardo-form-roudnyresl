@@ -57,10 +57,12 @@ RoudnyreslOrderFormSet = inlineformset_factory(RoudnyreslOrders, RoudnyreslProdu
                                                 'rozmer_motivu': widgets.TextInput(attrs={
                                                     "class": "form-control",
                                                     "required": "true",
+                                                    "placeholder": "132 × 32 mm"
                                                     }),
                                                 'soubor': widgets.FileInput(attrs={
                                                     "required": "true",
                                                     }),
                                             },
                                             form=RoudnyreslOrderForm, extra=1,
-                                            formset=BaseInlineRoudnyreslFormSet)
+                                            formset=BaseInlineRoudnyreslFormSet,
+                                            )
