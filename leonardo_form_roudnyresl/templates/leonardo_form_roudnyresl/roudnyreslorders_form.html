@@ -78,7 +78,7 @@ td ul.errorlist li {
 </style>
 <div class="col-md-12">
     <div class="alert alert-order fade in">
-        <strong>Jste nový zákazník?</strong> Před první objednávkou nás raději telefonicky kontaktujte. (telefon v patičce stránky)
+        {{ request.LEONARDO_CONFIG.INFO_NEW_CUSTOMERS|safe }}
     </div>
     <form id="roudnyreslform" action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}

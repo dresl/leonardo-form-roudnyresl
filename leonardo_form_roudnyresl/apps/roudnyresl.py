@@ -6,7 +6,7 @@ def roudnyresl_patterns(list_kwargs={}, detail_kwargs={}):
     return [
         url(r'^$',
             RoudnyreslOrderCreate.as_view(**list_kwargs), name='objedn_list'),
-        url(r'^objednavka/(?P<pk>\d+)/$',
+        url(r'^objednavka/(?P<slug>[\w-]+)/$',
             CreatedOrderInfo.as_view(), name='created_order'),
     ]
 

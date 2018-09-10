@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from leonardo.decorators import require_auth
 from django.db import transaction
 from leonardo import forms, messages
@@ -19,6 +19,7 @@ from .forms import RoudnyreslOrderFormSet
 from django.views.generic import CreateView, DetailView, ListView
 from leonardo.utils.emails import send_templated_email as send_mail
 from .form_choices import *
+from random import randint
 
 
 class RoudnyreslOrderCreate(CreateView):
@@ -26,9 +27,6 @@ class RoudnyreslOrderCreate(CreateView):
     fields = ['jmeno', 'prijmeni', 'email',
             'telefon', 'dorucovaci_adresa', 'firma',
             'ico', 'dic', 'doprava', 'platba', 'zprava']
-
-    def get_success_url(self):
-        return "/"
 
     def get_form(self, form_class):
         form = super(RoudnyreslOrderCreate, self).get_form(form_class)
@@ -50,7 +48,7 @@ class RoudnyreslOrderCreate(CreateView):
         else:
             data['orderproducts'] = RoudnyreslOrderFormSet()
         return data
-
+    
     def form_valid(self, form):
         context = self.get_context_data()
         orderproducts = context['orderproducts']
@@ -60,6 +58,16 @@ class RoudnyreslOrderCreate(CreateView):
                 orderproducts.instance = self.object
                 orderproducts.save()
                 current_order = RoudnyreslOrders.objects.get(id=orderproducts.instance.id,)
+                order_url_generated_id = str(
+                    str(randint(1000, 9999)) + \
+                    "-" + str(randint(10000, 99999)) + "-" + str(randint(100000, 999999)))
+                for order in RoudnyreslOrders.objects.all():
+                    if order.slug == order_url_generated_id:
+                        order_url_generated_id = str(
+                    str(randint(1000, 9999)) + \
+                    "-" + str(randint(10000, 99999)) + "-" + str(randint(100000, 999999)))
+                current_order.slug = order_url_generated_id
+                current_order.save()
                 subject_order = "Objednávka - " + current_order.get_full_name()
                 send_mail(
                     subject_order,
@@ -83,7 +91,7 @@ class RoudnyreslOrderCreate(CreateView):
                     current_order.email,
                     fail_silently=False,
                 )
-                return HttpResponseRedirect("objednavka/%s" % self.object.id)
+                return HttpResponseRedirect("objednavka/%s" % current_order.slug)
         return super(RoudnyreslOrderCreate, self).form_valid(form)
 
 

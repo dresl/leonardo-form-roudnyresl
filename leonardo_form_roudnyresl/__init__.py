@@ -26,6 +26,7 @@ class Default(object):
         'CHOICES_DOPRAVA': ('', 'Tuple choices'),
         'CHOICES_PLATBA': ('', 'Tuple choices'),
         'INFO_PRODUCT_ORDER': ('', 'Info text'),
+        'INFO_NEW_CUSTOMERS': ('', 'Info for new customers'),
     }
 
     @property

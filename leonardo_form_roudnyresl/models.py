@@ -6,12 +6,16 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import datetime
+from django.utils.encoding import python_2_unicode_compatible
 from leonardo.module.media.fields.multistorage_file import MultiStorageFileField
+
 
 class RoudnyreslOrders(models.Model):
 
     jmeno = models.CharField(
         max_length=255, verbose_name=u"Jméno", default='')
+    slug = models.CharField(
+        verbose_name=u"URL ID", max_length=150, blank=True, null=True)
     prijmeni = models.CharField(
         max_length=255, verbose_name=u"Příjmení", default='')
     email = models.EmailField(
@@ -34,21 +38,18 @@ class RoudnyreslOrders(models.Model):
         verbose_name=u"Poznámka", default='', blank=True)
     pub_date = models.DateTimeField(u'Datum objednávky', auto_now_add=True)
 
-    def get_full_name(self):
-        return str(self.jmeno.encode("utf-8") + " " + self.prijmeni.encode("utf-8"))
-
-    @property
     def get_absolute_url(self):
         from leonardo.module.web.widget.application.reverse import app_reverse
         return app_reverse(
             'created_order',
             'leonardo_form_roudnyresl.apps.roudnyresl',
-            kwargs={
-                'pk': self.id,
-            })
+            kwargs={'slug': self.slug})
+
+    def get_full_name(self):
+        return str(self.jmeno.encode("utf-8") + " " + self.prijmeni.encode("utf-8"))
 
     def __unicode__(self):
-        return self.jmeno.encode("utf-8")
+        return self.jmeno
 
     class Meta:
         ordering = ['jmeno', ]
